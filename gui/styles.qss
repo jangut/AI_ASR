@@ -1,0 +1,16 @@
+QMainWindow {
+    background-color: #ffffff;
+}
+QPushButton {
+    background-color: #e0e0e0;
+    border: 1px solid #aaa;
+    border-radius: 4px;
+    padding: 6px;
+}
+QPushButton:checked {
+    background-color: #bbdefb;
+}
+SubtitleWidget {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}

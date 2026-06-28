@@ -1,0 +1,35 @@
+修改 main.py 增加 GUI 入口
+假设原来的 main.py 可能是这样：
+
+python
+from app import Application
+from config import Config
+
+config = Config()
+app = Application(config)
+app.initialize()
+app.start()
+app.wait()
+现在增加 GUI 分支：
+
+python
+import sys
+from app import Application
+from config import Config
+from gui import start_gui
+
+def main():
+    config = Config()
+    app = Application(config)
+    app.initialize()
+
+    if "--gui" in sys.argv:
+        # 运行 GUI
+        start_gui(config, app)
+    else:
+        # 命令行模式
+        app.start()
+        app.wait()
+
+if __name__ == "__main__":
+    main()

@@ -15,7 +15,8 @@ import numpy as np
 
 from config import Config
 
-from core.event import EventBus
+from core.event import Event, EventBus
+from core.events import Events
 from core.logger import configure_logger, get_logger
 
 from audio.ringbuffer import RingBuffer
@@ -36,8 +37,8 @@ from plugins.markdown import MarkdownPlugin
 class Application:
     """SpeechNote 应用程序。"""
 
-    def __init__(self) -> None:
-        self._config = Config()
+    def __init__(self, config: Config | None = None) -> None:
+        self._config = config or Config()
 
         configure_logger()
         self._logger = get_logger()
@@ -105,12 +106,20 @@ class Application:
         for plugin in self._plugins:
             plugin.register(self._event_bus)
 
+    @property
+    def event_bus(self) -> EventBus:
+        """Get EventBus instance."""
+        assert self._event_bus is not None
+        return self._event_bus
+
     def start(self) -> None:
         """启动应用程序。"""
 
         assert self._recognizer is not None
         assert self._worker is not None
         assert self._recorder is not None
+
+        self._event_bus.emit(Event(Events.START, None))
 
         self._recognizer.load_model()
 
@@ -147,6 +156,8 @@ class Application:
 
         if self._recognizer:
             self._recognizer.release()
+
+        self._event_bus.emit(Event(Events.STOP, None))
 
         self._logger.info(
             "SpeechNote exited."

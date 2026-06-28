@@ -1,15 +1,28 @@
 """
-SpeechNote 程序入口。
+SpeechNote entry.
 
-本文件永久保持极简。
+python main.py          # CLI mode
+python main.py --gui    # GUI mode
 """
 
+import sys
+
+from config import Config
 from app import Application
 
 
 def main() -> None:
-    """程序入口。"""
-    Application().run()
+    """Program entry."""
+    config = Config()
+    app = Application(config)
+    app.initialize()
+
+    if "--gui" in sys.argv:
+        from gui import start_gui
+        start_gui(config, app)
+    else:
+        app.start()
+        app.wait()
 
 
 if __name__ == "__main__":
