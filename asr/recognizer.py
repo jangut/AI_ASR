@@ -91,6 +91,11 @@ class SenseVoiceRecognizer(BaseRecognizer):
 
         self._logger.info("SenseVoice model loaded.")
 
+    @staticmethod
+    def _clean_text(text: str) -> str:
+        """去除 SenseVoice 标签（语言、情感、事件等）。"""
+        return re.sub(r"<\|.*?\|>", "", text).strip()
+
     def recognize(
         self,
         audio: np.ndarray,
@@ -111,7 +116,7 @@ class SenseVoiceRecognizer(BaseRecognizer):
         )
 
         text = result[0]["text"]
-        text = re.sub(r"<\|.*?\|>", "", text).strip()
+        text = self._clean_text(text)
 
         return Sentence(
             raw_text=text,
@@ -128,6 +133,7 @@ class SenseVoiceRecognizer(BaseRecognizer):
         self._model = None
 
         self._logger.info("SenseVoice model released.")
+
 
 
 

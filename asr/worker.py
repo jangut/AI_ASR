@@ -114,8 +114,13 @@ class ASRWorker:
                 audio.shape,
             )
 
-            sentence = self._recognizer.recognize(audio)
-            sentence = self._pipeline.correct(sentence)
+            try:
+                sentence = self._recognizer.recognize(audio)
+                sentence = self._pipeline.correct(sentence)
+            except Exception:
+                self._logger.exception("Recognition failed")
+                self._event_bus.emit(Event(Events.ERROR, None))
+                continue
 
             if not sentence.text.strip():
                 continue
@@ -124,4 +129,5 @@ class ASRWorker:
                 continue
 
             self._event_bus.emit(Event(Events.SENTENCE, sentence))
+
 
