@@ -23,7 +23,7 @@ from asr.base import BaseRecognizer
 from core.event import Event, EventBus
 from core.events import Events
 from core.logger import get_logger
-from corrector.base import BaseCorrector
+from corrector.pipeline import CorrectorPipeline
 
 
 class ASRWorker:
@@ -37,7 +37,7 @@ class ASRWorker:
         self,
         buffer: RingBuffer[np.ndarray],
         recognizer: BaseRecognizer,
-        corrector: BaseCorrector,
+        pipeline: CorrectorPipeline,
         event_bus: EventBus,
         *,
         sample_rate: int,
@@ -50,7 +50,7 @@ class ASRWorker:
 
         self._buffer = buffer
         self._recognizer = recognizer
-        self._corrector = corrector
+        self._pipeline = pipeline
         self._event_bus = event_bus
 
         self._thread: Thread | None = None
@@ -115,7 +115,7 @@ class ASRWorker:
             )
 
             sentence = self._recognizer.recognize(audio)
-            sentence = self._corrector.correct(sentence)
+            sentence = self._pipeline.correct(sentence)
 
             if not sentence.text.strip():
                 continue
@@ -124,3 +124,4 @@ class ASRWorker:
                 continue
 
             self._event_bus.emit(Event(Events.SENTENCE, sentence))
+

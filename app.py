@@ -26,8 +26,8 @@ from asr.base import BaseRecognizer
 from asr.recognizer import SenseVoiceRecognizer
 from asr.worker import ASRWorker
 
-from corrector.base import BaseCorrector
-from corrector.identity import IdentityCorrector
+from corrector.pipeline import CorrectorPipeline
+from corrector.duplicate import DuplicateCorrector
 
 from plugins.base import BasePlugin
 from plugins.markdown import MarkdownPlugin
@@ -73,12 +73,14 @@ class Application:
 
         self._recognizer = SenseVoiceRecognizer(model_dir=self._config.model_dir, device=self._config.device)
 
-        self._corrector = IdentityCorrector()
+        self._pipeline = CorrectorPipeline([
+            DuplicateCorrector(),
+        ])
 
         self._worker = ASRWorker(
             buffer=self._buffer,
             recognizer=self._recognizer,
-            corrector=self._corrector,
+            pipeline=self._pipeline,
             event_bus=self._event_bus,
             sample_rate=self._config.sample_rate,
             recognize_window=self._config.recognize_window,
@@ -152,6 +154,8 @@ class Application:
         self.initialize()
         self.start()
         self.wait()
+
+
 
 
 
